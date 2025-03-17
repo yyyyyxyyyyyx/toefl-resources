@@ -1,6 +1,6 @@
 {
   "build": {
-    "command": "",
+    "command": "echo \"Deploying static site\"",
     "output_directory": ".",
     "root_directory": "."
   }
