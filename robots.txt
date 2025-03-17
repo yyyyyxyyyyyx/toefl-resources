@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://toefl-resources.pages.dev/sitemap.xml
