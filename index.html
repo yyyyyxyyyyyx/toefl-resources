@@ -238,8 +238,7 @@
       relativePath: false,
       basePath: './',
       alias: {
-        '/.*/.*_sidebar.md': '/_sidebar.md',
-        '/toefl/listening/real-exams/.*/_sidebar.md': '/toefl/listening/real-exams/_sidebar.md'
+        '/_sidebar.md': '/_sidebar.md'
       },
       requestHeaders: {
         'cache-control': 'max-age=0'
@@ -248,7 +247,7 @@
       plugins: [
         function(hook, vm) {
           // 模板处理插件
-          hook.beforeEach(function(content, next) {
+          hook.beforeEach(function(content) {
             // 检查是否是真题页面
             if (vm.route.path.includes('/toefl/listening/real-exams/')) {
               // 替换模板标记
@@ -257,8 +256,24 @@
               
               content = content.replace(/\{\{answer\}\}/g, '<div class="answer-section">');
               content = content.replace(/\{\{\/answer\}\}/g, '</div><button class="show-answer-btn">显示答案</button>');
+              
+              // 获取URL参数
+              var params = {};
+              location.search.slice(1).split('&').forEach(function(item) {
+                var parts = item.split('=');
+                if (parts[0]) {
+                  params[parts[0]] = decodeURIComponent(parts[1] || '');
+                }
+              });
+              
+              // 替换模板变量
+              content = content
+                .replace(/\{\{title\}\}/g, params.title || '')
+                .replace(/\{\{date\}\}/g, params.date || '')
+                .replace(/\{\{videoUrl\}\}/g, params.videoUrl || '')
+                .replace(/\{\{transcript\}\}/g, params.transcript || '');
             }
-            next(content);
+            return content;
           });
           
           // 在DOM准备好后添加事件监听
