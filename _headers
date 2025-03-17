@@ -1,6 +1,6 @@
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
-  Referrer-Policy: strict-origin-when-cross-origin
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' *.jsdelivr.net cdn.jsdelivr.net; img-src 'self' data: *.jsdelivr.net cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' *.jsdelivr.net cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' *.jsdelivr.net cdn.jsdelivr.net;
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:;

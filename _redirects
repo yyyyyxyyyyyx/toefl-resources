@@ -6,3 +6,6 @@
 
 # 确保嵌套路径被正确处理
 /toefl/* /index.html 200!
+
+# 允许跨域资源共享
+https://gtxlwhybutfeckijpzyh.supabase.co/* https://gtxlwhybutfeckijpzyh.supabase.co/:splat 200
