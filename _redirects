@@ -1,8 +1,8 @@
-# 重定向规则
-/* /index.html 200
+# 重定向规则 - 修复无限循环问题
+/* /index.html 200!
 
 # 确保.md文件被正确处理
-/*.md /index.html 200
+/*.md /index.html 200!
 
 # 确保嵌套路径被正确处理
-/toefl/* /index.html 200
+/toefl/* /index.html 200!

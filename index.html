@@ -228,6 +228,7 @@
   <div id="app"></div>
   <script>
     window.$docsify = {
+      el: '#app',
       loadSidebar: true,
       subMaxLevel: 3,
       name: 'Runaway 驿站',
@@ -237,9 +238,13 @@
       relativePath: false,
       basePath: './',
       alias: {
-        '/.*/_sidebar.md': '/_sidebar.md',
+        '/.*/.*_sidebar.md': '/_sidebar.md',
         '/toefl/listening/real-exams/.*/_sidebar.md': '/toefl/listening/real-exams/_sidebar.md'
       },
+      requestHeaders: {
+        'cache-control': 'max-age=0'
+      },
+      notFoundPage: true,
       plugins: [
         function(hook, vm) {
           // 模板处理插件

@@ -1,0 +1,11 @@
+{
+  "build": {
+    "command": "",
+    "publish": ".",
+    "base": ""
+  },
+  "routes": [
+    { "src": "/(.*)\\.md", "dest": "/index.html" },
+    { "src": "/(.*)", "dest": "/index.html", "status": 200 }
+  ]
+}
