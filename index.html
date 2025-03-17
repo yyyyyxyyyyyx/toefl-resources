@@ -232,11 +232,13 @@
       loadSidebar: true,
       subMaxLevel: 3,
       name: 'Runaway 驿站',
+      nameLink: '/',
       logo: './assets/images/logo.png',
       repo: '',
       auto2top: true,
-      relativePath: false,
-      basePath: './',
+      relativePath: true,
+      basePath: '',
+      mergeNavbar: true,
       alias: {
         '/_sidebar.md': '/_sidebar.md'
       },
@@ -250,28 +252,53 @@
           hook.beforeEach(function(content) {
             // 检查是否是真题页面
             if (vm.route.path.includes('/toefl/listening/real-exams/')) {
+              // 处理YAML front matter
+              const yamlMatch = content.match(/---\n([\s\S]*?)\n---/);
+              if (yamlMatch) {
+                const yamlContent = yamlMatch[1];
+                const lines = yamlContent.split('\n');
+                const metadata = {};
+                
+                lines.forEach(line => {
+                  const parts = line.split(':');
+                  if (parts.length >= 2) {
+                    const key = parts[0].trim();
+                    const value = parts.slice(1).join(':').trim();
+                    metadata[key] = value;
+                  }
+                });
+                
+                // 移除YAML front matter
+                content = content.replace(/---\n[\s\S]*?\n---/, '');
+                
+                // 添加标题和元数据
+                let header = `# ${metadata.title || ''}\n\n`;
+                header += `> [小红书 @Sr](https://www.xiaohongshu.com/user/profile/65c8a2f3000000000b036b41)  更新时间：${metadata.date || ''}\n\n`;
+                header += `!> 更佳刷题体验欢迎前往 [Runaway 本站](https://www.runaway.cc/)（runaway.cc）。\n\n`;
+                
+                // 添加视频（如果有）
+                if (metadata.videoUrl) {
+                  header += `### 笔记视频\n\n`;
+                  header += `<div style="position: relative; padding-bottom: 40%; height: 0; max-width: 80%; margin: 0 auto;">\n`;
+                  header += `  <iframe src="${metadata.videoUrl}" \n`;
+                  header += `          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" \n`;
+                  header += `          frameborder="0" \n`;
+                  header += `          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" \n`;
+                  header += `          allowfullscreen>\n`;
+                  header += `  </iframe>\n`;
+                  header += `</div>\n\n`;
+                  header += `> 如果视频无法播放，请访问[小红书 @Sr](https://www.xiaohongshu.com/user/profile/65c8a2f3000000000b036b41) 观看视频。\n\n`;
+                }
+                
+                content = header + content;
+              }
+              
               // 替换模板标记
               content = content.replace(/\{\{question\}\}/g, '<div class="question-section">');
               content = content.replace(/\{\{\/question\}\}/g, '</div>');
               
               content = content.replace(/\{\{answer\}\}/g, '<div class="answer-section">');
               content = content.replace(/\{\{\/answer\}\}/g, '</div><button class="show-answer-btn">显示答案</button>');
-              
-              // 获取URL参数
-              var params = {};
-              location.search.slice(1).split('&').forEach(function(item) {
-                var parts = item.split('=');
-                if (parts[0]) {
-                  params[parts[0]] = decodeURIComponent(parts[1] || '');
-                }
-              });
-              
-              // 替换模板变量
-              content = content
-                .replace(/\{\{title\}\}/g, params.title || '')
-                .replace(/\{\{date\}\}/g, params.date || '')
-                .replace(/\{\{videoUrl\}\}/g, params.videoUrl || '')
-                .replace(/\{\{transcript\}\}/g, params.transcript || '');
             }
             return content;
           });
