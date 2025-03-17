@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="托福、SAT、GRE等考试备考资源">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
   <style>
     :root {
       --theme-color: #3273dc;
@@ -200,24 +200,27 @@
     .sidebar .app-name-link img {
       height: 40px;
       margin-right: 10px;
-      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
     }
-    .sidebar .app-name-link::after {
-      content: "Runaway 驿站";
-      font-size: 14px;
-      color: #777;
-      font-weight: normal;
-      white-space: nowrap;
+    .sidebar .app-name-link span {
+      font-size: 1.2rem;
     }
     
-    /* 移除顶部蓝色条 */
+    /* 添加站点描述 */
+    .sidebar .site-description {
+      font-size: 0.8rem;
+      color: var(--text-color-tertiary);
+      text-align: center;
+      margin-top: -5px;
+      margin-bottom: 10px;
+    }
+    
     body > .app-name {
       display: none;
     }
     
     /* 调整内容区域上边距 */
     .content {
-      padding-top: 20px;
+      padding-top: 0;
     }
   </style>
 </head>
@@ -237,135 +240,104 @@
         '/.*/_sidebar.md': '/_sidebar.md',
         '/toefl/listening/real-exams/.*/_sidebar.md': '/toefl/listening/real-exams/_sidebar.md'
       },
-      pagination: {
-        previousText: '上一章',
-        nextText: '下一章',
-        crossChapter: true,
-        crossChapterText: true,
-      },
-      themeColor: '#3273dc',
-      templating: {
-        // 启用模板功能
-        enabled: true,
-        // 定义模板路径
-        root: 'toefl/listening/real-exams/'
-      },
       plugins: [
         function(hook, vm) {
           // 模板处理插件
           hook.beforeEach(function(content, next) {
             // 检查是否是真题页面
-            if (vm.route.path.includes('/toefl/listening/real-exams/') && 
-                !vm.route.path.includes('_template') && 
-                !vm.route.path.includes('_sidebar')) {
+            if (vm.route.path.includes('/toefl/listening/real-exams/')) {
+              // 替换模板标记
+              content = content.replace(/\{\{question\}\}/g, '<div class="question-section">');
+              content = content.replace(/\{\{\/question\}\}/g, '</div>');
               
-              // 获取模板内容
-              fetch('/toefl/listening/real-exams/_template.md')
-                .then(response => response.text())
-                .then(template => {
-                  // 解析页面的前置元数据
-                  let frontMatter = {};
-                  let contentWithoutFrontMatter = content;
-                  
-                  // 检查是否有前置元数据
-                  const fmMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-                  if (fmMatch) {
-                    // 提取前置元数据
-                    const fmContent = fmMatch[1];
-                    contentWithoutFrontMatter = fmMatch[2];
-                    
-                    // 解析YAML格式的前置元数据
-                    fmContent.split('\n').forEach(line => {
-                      if (line.trim() && line.includes(':')) {
-                        const [key, ...valueParts] = line.split(':');
-                        const value = valueParts.join(':').trim();
-                        frontMatter[key.trim()] = value;
-                      }
-                    });
-                  }
-                  
-                  // 提取页面元数据
-                  const title = frontMatter.title || vm.route.path.split('/').pop().replace('.md', '');
-                  const date = frontMatter.date || new Date().toISOString().slice(0, 10);
-                  const videoUrl = frontMatter.videoUrl || '';
-                  
-                  // 从内容中提取音频原文、问题和答案
-                  let transcript = '';
-                  let questions = '';
-                  let answers = '';
-                  
-                  // 提取音频原文
-                  const transcriptMatch = contentWithoutFrontMatter.match(/###\s*音频原文\s*([\s\S]*?)(?=###|$)/);
-                  if (transcriptMatch) {
-                    transcript = transcriptMatch[1].trim();
-                  }
-                  
-                  // 提取问题
-                  const questionsMatch = contentWithoutFrontMatter.match(/###\s*问题\s*([\s\S]*?)(?=###\s*答案|$)/);
-                  if (questionsMatch) {
-                    questions = questionsMatch[1].trim();
-                  }
-                  
-                  // 提取答案
-                  const answersMatch = contentWithoutFrontMatter.match(/###\s*答案\s*([\s\S]*?)(?=###|$)/);
-                  if (answersMatch) {
-                    answers = answersMatch[1].trim();
-                  }
-                  
-                  // 使用提取的内容填充模板
-                  let processedContent = template
-                    .replace(/{{title}}/g, title)
-                    .replace(/{{date}}/g, date)
-                    .replace(/{{videoUrl}}/g, videoUrl)
-                    .replace(/{{transcript}}/g, transcript)
-                    .replace(/{{questions}}/g, questions)
-                    .replace(/{{answers}}/g, answers);
-                  
-                  // 返回处理后的内容
-                  next(processedContent);
-                })
-                .catch(error => {
-                  console.error('Error loading template:', error);
-                  next(content);
-                });
-            } else {
-              next(content);
+              content = content.replace(/\{\{answer\}\}/g, '<div class="answer-section">');
+              content = content.replace(/\{\{\/answer\}\}/g, '</div><button class="show-answer-btn">显示答案</button>');
             }
+            next(content);
           });
-
+          
+          // 在DOM准备好后添加事件监听
           hook.doneEach(function() {
-            const answerSections = document.querySelectorAll('.answer-section');
+            // 为所有"显示答案"按钮添加点击事件
             const buttons = document.querySelectorAll('.show-answer-btn');
-            
-            buttons.forEach((button, index) => {
+            buttons.forEach(button => {
               button.addEventListener('click', function() {
-                const answerSection = answerSections[index];
+                const answerSection = this.previousElementSibling;
                 if (answerSection.style.display === 'block') {
                   answerSection.style.display = 'none';
-                  button.textContent = '显示答案';
+                  this.textContent = '显示答案';
                 } else {
                   answerSection.style.display = 'block';
-                  button.textContent = '隐藏答案';
+                  this.textContent = '隐藏答案';
                 }
               });
             });
-
-            const path = vm.route.path;
-            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
-            sidebarLinks.forEach(link => {
-              if (link.getAttribute('href') === ('#' + path)) {
-                link.parentElement.classList.add('active');
+            
+            // 添加站点描述
+            const appName = document.querySelector('.sidebar .app-name');
+            if (appName) {
+              const siteDesc = document.createElement('div');
+              siteDesc.className = 'site-description';
+              siteDesc.textContent = 'Runaway 驿站';
+              
+              // 在app-name之后插入描述
+              appName.parentNode.insertBefore(siteDesc, appName.nextSibling);
+            }
+            
+            // 添加上一篇/下一篇导航
+            if (vm.route.path.includes('/toefl/')) {
+              const content = document.querySelector('.content');
+              if (content) {
+                const currentPath = vm.route.path;
+                const sidebar = document.querySelector('.sidebar-nav');
+                
+                if (sidebar) {
+                  const links = Array.from(sidebar.querySelectorAll('a'));
+                  const currentIndex = links.findIndex(link => {
+                    const href = link.getAttribute('href');
+                    return href === `#${currentPath}` || href === `#${currentPath}/`;
+                  });
+                  
+                  if (currentIndex !== -1) {
+                    const prevLink = links[currentIndex - 1];
+                    const nextLink = links[currentIndex + 1];
+                    
+                    let navHTML = '<div class="siblings-nav">';
+                    
+                    if (prevLink) {
+                      navHTML += `<a href="${prevLink.getAttribute('href')}" class="prev-link">« ${prevLink.textContent}</a>`;
+                    } else {
+                      navHTML += '<span></span>';
+                    }
+                    
+                    if (nextLink) {
+                      navHTML += `<a href="${nextLink.getAttribute('href')}" class="next-link">${nextLink.textContent} »</a>`;
+                    } else {
+                      navHTML += '<span></span>';
+                    }
+                    
+                    navHTML += '</div>';
+                    
+                    // 添加到内容底部
+                    const article = content.querySelector('article.markdown-section');
+                    if (article) {
+                      const navElement = document.createElement('div');
+                      navElement.innerHTML = navHTML;
+                      article.appendChild(navElement.firstChild);
+                    }
+                  }
+                }
               }
-            });
+            }
           });
         }
       ]
     }
   </script>
   <!-- Docsify v4 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-bash.min.js"></script>
 </body>
 </html>
