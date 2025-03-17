@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>添加新托福真题 - Runaway 驿站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    body {
+      padding: 20px;
+      background-color: #f8f9fa;
+    }
+    .container {
+      max-width: 800px;
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #42b983;
+      margin-bottom: 30px;
+    }
+    .form-label {
+      font-weight: 500;
+    }
+    .btn-primary {
+      background-color: #42b983;
+      border-color: #42b983;
+    }
+    .btn-primary:hover {
+      background-color: #3aa876;
+      border-color: #3aa876;
+    }
+    #preview {
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #dee2e6;
+      border-radius: 5px;
+      background-color: #f8f9fa;
+      white-space: pre-wrap;
+    }
+    .preview-title {
+      margin-top: 30px;
+      color: #42b983;
+    }
+    #downloadLink {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>添加新托福真题</h1>
+    
+    <form id="examForm">
+      <div class="mb-3">
+        <label for="examId" class="form-label">真题ID (例如: 250301_L1)</label>
+        <input type="text" class="form-control" id="examId" required>
+      </div>
+      
+      <div class="mb-3">
+        <label for="videoUrl" class="form-label">视频链接</label>
+        <input type="text" class="form-control" id="videoUrl" placeholder="https://gtxlwhybutfeckijpzyh.supabase.co/storage/v1/object/public/toefl-videos//...">
+      </div>
+      
+      <div class="mb-3">
+        <label for="transcript" class="form-label">音频原文</label>
+        <textarea class="form-control" id="transcript" rows="6"></textarea>
+      </div>
+      
+      <div class="mb-3">
+        <label for="questions" class="form-label">问题与选项 (每个问题一行，选项缩进)</label>
+        <textarea class="form-control" id="questions" rows="10" placeholder="1. What does the professor mainly discuss?  
+A. Option A  
+B. Option B  
+C. Option C  
+D. Option D  
+
+2. Another question?
+..."></textarea>
+      </div>
+      
+      <div class="mb-3">
+        <label for="answers" class="form-label">答案 (每行一个，例如: 1. C)</label>
+        <textarea class="form-control" id="answers" rows="6" placeholder="1. C
+2. A
+3. D
+..."></textarea>
+      </div>
+      
+      <button type="button" class="btn btn-secondary" id="previewBtn">预览</button>
+      <button type="button" class="btn btn-primary" id="generateBtn">生成文件</button>
+    </form>
+    
+    <h3 class="preview-title">预览</h3>
+    <div id="preview"></div>
+    
+    <a id="downloadLink" class="btn btn-success" download>下载Markdown文件</a>
+    
+    <div class="mt-4">
+      <h4>使用说明:</h4>
+      <ol>
+        <li>填写真题ID、视频链接、音频原文、问题和答案</li>
+        <li>点击"预览"按钮查看生成的Markdown内容</li>
+        <li>点击"生成文件"按钮下载Markdown文件</li>
+        <li>将下载的文件放到 <code>toefl/listening/real-exams/</code> 目录中</li>
+        <li>手动更新 <code>_sidebar.md</code> 和 <code>real-exams.md</code> 文件添加新链接</li>
+      </ol>
+      <p><strong>注意:</strong> 由于浏览器安全限制，无法直接在前端自动创建文件到服务器。您需要手动下载并添加文件。</p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('previewBtn').addEventListener('click', function() {
+      generatePreview();
+    });
+    
+    document.getElementById('generateBtn').addEventListener('click', function() {
+      generateFile();
+    });
+    
+    function generatePreview() {
+      const examId = document.getElementById('examId').value;
+      const videoUrl = document.getElementById('videoUrl').value;
+      const transcript = document.getElementById('transcript').value;
+      const questions = document.getElementById('questions').value;
+      const answers = document.getElementById('answers').value;
+      
+      // 生成Markdown内容
+      const markdown = generateMarkdown(examId, videoUrl, transcript, questions, answers);
+      
+      // 显示预览
+      document.getElementById('preview').textContent = markdown;
+    }
+    
+    function generateMarkdown(examId, videoUrl, transcript, questions, answers) {
+      let markdown = `## ${examId}\n\n`;
+      markdown += `> [小红书 @Sr](https://www.xiaohongshu.com/user/profile/65c8a2f3000000000b036b41)  更新时间：${new Date().toISOString().slice(0, 10)}\n\n`;
+      
+      // 添加视频部分
+      markdown += `### 笔记视频\n\n`;
+      if (videoUrl) {
+        markdown += `<div style="position: relative; padding-bottom: 40%; height: 0; max-width: 80%; margin: 0 auto;">\n`;
+        markdown += `  <iframe src="${videoUrl}" \n`;
+        markdown += `          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" \n`;
+        markdown += `          frameborder="0" \n`;
+        markdown += `          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" \n`;
+        markdown += `          allowfullscreen>\n`;
+        markdown += `  </iframe>\n`;
+        markdown += `</div>\n\n`;
+      }
+      
+      markdown += `> 如果视频无法播放，请访问[小红书 @Sr](https://www.xiaohongshu.com/user/profile/65c8a2f3000000000b036b41) 观看视频。\n\n`;
+      
+      // 添加音频原文
+      markdown += `### 音频原文\n\n${transcript}\n\n\n`;
+      
+      // 添加问题
+      markdown += `### 问题\n\n`;
+      markdown += `> 更佳刷题体验欢迎前往 [Runaway 本站](https://www.runaway.cc/)（runaway.cc）。\n\n`;
+      markdown += `${questions}\n\n`;
+      
+      // 添加答案按钮和答案部分
+      markdown += `<button class="show-answer-btn">显示答案</button>\n\n`;
+      markdown += `<div class="answer-section">\n`;
+      markdown += `<h3>答案</h3>\n\n`;
+      
+      // 处理答案格式
+      const answerLines = answers.split('\n').filter(line => line.trim());
+      for (const line of answerLines) {
+        markdown += `${line.trim()}\n`;
+      }
+      
+      markdown += `</div>\n`;
+      
+      return markdown;
+    }
+    
+    function generateFile() {
+      const examId = document.getElementById('examId').value;
+      if (!examId) {
+        alert('请输入真题ID');
+        return;
+      }
+      
+      const videoUrl = document.getElementById('videoUrl').value;
+      const transcript = document.getElementById('transcript').value;
+      const questions = document.getElementById('questions').value;
+      const answers = document.getElementById('answers').value;
+      
+      // 生成Markdown内容
+      const markdown = generateMarkdown(examId, videoUrl, transcript, questions, answers);
+      
+      // 创建下载链接
+      const blob = new Blob([markdown], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const downloadLink = document.getElementById('downloadLink');
+      downloadLink.href = url;
+      downloadLink.download = `${examId}.md`;
+      downloadLink.textContent = `下载 ${examId}.md`;
+      downloadLink.style.display = 'inline-block';
+      
+      // 显示预览
+      document.getElementById('preview').textContent = markdown;
+      
+      // 提示用户
+      alert(`Markdown文件已生成，点击"下载Markdown文件"按钮下载。\n\n下载后请将文件放到 toefl/listening/real-exams/ 目录，并更新侧边栏和真题列表。`);
+    }
+  </script>
+</body>
+</html>

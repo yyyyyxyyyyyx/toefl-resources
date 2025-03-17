@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Runaway 驿站</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="托福、SAT、GRE等考试备考资源">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <style>
+    :root {
+      --theme-color: #3273dc;
+      --theme-color-dark: #2160c4;
+      --text-color-base: #2c3e50;
+      --text-color-secondary: #476582;
+      --text-color-tertiary: #999;
+    }
+
+    .answer-section {
+      display: none;
+      padding: 10px;
+      margin: 10px 0;
+      border-left: 4px solid var(--theme-color);
+      background-color: #f8f8f8;
+    }
+    .show-answer-btn {
+      background-color: var(--theme-color);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+    .show-answer-btn:hover {
+      background-color: var(--theme-color-dark);
+    }
+    .sidebar-nav li.active {
+      background-color: rgba(50, 115, 220, 0.1);
+    }
+    .sidebar-nav li.active a {
+      font-weight: bold;
+      color: var(--theme-color);
+    }
+    .siblings-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    .siblings-nav a {
+      color: var(--theme-color);
+      text-decoration: none;
+    }
+    .app-name {
+      display: none;
+    }
+    .app-name-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px 0;
+      color: var(--theme-color) !important;
+      font-size: 1.5rem !important;
+      font-weight: 600;
+      text-decoration: none !important;
+      transition: all 0.3s ease;
+    }
+    .app-name-link:hover {
+      transform: scale(1.02);
+    }
+    .app-name-link img {
+      height: 50px;
+      margin-right: 15px;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
+    }
+    .app-name-link span {
+      background: linear-gradient(to right, #3273dc, #4e92ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    
+    /* 自定义主题色 */
+    .markdown-section a {
+      color: var(--theme-color);
+    }
+    .markdown-section blockquote {
+      border-left: 4px solid var(--theme-color);
+    }
+    .markdown-section h1, 
+    .markdown-section h2, 
+    .markdown-section h3, 
+    .markdown-section h4, 
+    .markdown-section h5, 
+    .markdown-section h6 {
+      color: var(--text-color-base);
+    }
+    .markdown-section h1 {
+      border-bottom: 1px solid #eaecef;
+    }
+    .search input {
+      border: 1px solid #eaecef;
+    }
+    .search input:focus {
+      border: 1px solid var(--theme-color);
+    }
+    .search .search-keyword {
+      color: var(--theme-color);
+    }
+    .sidebar ul li.active>a {
+      color: var(--theme-color);
+      border-right: 2px solid var(--theme-color);
+    }
+    .sidebar-toggle {
+      background-color: transparent;
+    }
+    .sidebar-toggle span {
+      background-color: var(--theme-color);
+    }
+    .docsify-pagination-container {
+      border-top: 1px solid #eaecef;
+    }
+    .docsify-pagination-container .pagination-item-title {
+      color: var(--theme-color);
+    }
+    
+    /* 侧边栏样式优化 */
+    .sidebar {
+      background-color: #f8fafc;
+      border-right: 1px solid rgba(234, 236, 239, 0.5);
+    }
+    .sidebar-nav {
+      padding: 0 15px;
+    }
+    .sidebar-nav > ul > li {
+      margin: 6px 0;
+    }
+    .sidebar-nav > ul > li > a {
+      font-weight: 600;
+      color: var(--text-color-base);
+    }
+    .sidebar-nav ul li a {
+      padding: 4px 0;
+      transition: all 0.2s ease;
+    }
+    .sidebar-nav ul li a:hover {
+      text-decoration: none;
+      color: var(--theme-color);
+    }
+    .sidebar-nav ul li.active > a {
+      color: var(--theme-color);
+      border-right: 2px solid var(--theme-color);
+      background-color: rgba(50, 115, 220, 0.05);
+      padding-left: 5px;
+      border-radius: 3px 0 0 3px;
+    }
+    
+    /* 内容区域样式优化 */
+    .content {
+      padding-top: 10px;
+    }
+    .markdown-section {
+      max-width: 900px;
+      padding: 30px 30px 40px;
+    }
+    
+    /* 移动端适配优化 */
+    @media screen and (max-width: 768px) {
+      .app-name-link {
+        font-size: 1.2rem !important;
+      }
+      .app-name-link img {
+        height: 40px;
+      }
+      .markdown-section {
+        padding: 20px 15px;
+      }
+    }
+    
+    /* 自定义logo和站名样式 */
+    .sidebar .app-name {
+      display: block;
+      padding: 0;
+      background: none;
+      box-shadow: none;
+      border: none;
+      margin-bottom: 10px;
+    }
+    .sidebar .app-name-link {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 10px 0;
+    }
+    .sidebar .app-name-link img {
+      height: 40px;
+      margin-right: 10px;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.1));
+    }
+    .sidebar .app-name-link::after {
+      content: "Runaway 驿站";
+      font-size: 14px;
+      color: #777;
+      font-weight: normal;
+      white-space: nowrap;
+    }
+    
+    /* 移除顶部蓝色条 */
+    body > .app-name {
+      display: none;
+    }
+    
+    /* 调整内容区域上边距 */
+    .content {
+      padding-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    window.$docsify = {
+      loadSidebar: true,
+      subMaxLevel: 3,
+      name: 'Runaway 驿站',
+      logo: '/assets/images/logo.png',
+      repo: '',
+      auto2top: true,
+      relativePath: true,
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md',
+        '/toefl/listening/real-exams/.*/_sidebar.md': '/toefl/listening/real-exams/_sidebar.md'
+      },
+      pagination: {
+        previousText: '上一章',
+        nextText: '下一章',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      themeColor: '#3273dc',
+      templating: {
+        // 启用模板功能
+        enabled: true,
+        // 定义模板路径
+        root: 'toefl/listening/real-exams/'
+      },
+      plugins: [
+        function(hook, vm) {
+          // 模板处理插件
+          hook.beforeEach(function(content, next) {
+            // 检查是否是真题页面
+            if (vm.route.path.includes('/toefl/listening/real-exams/') && 
+                !vm.route.path.includes('_template') && 
+                !vm.route.path.includes('_sidebar')) {
+              
+              // 获取模板内容
+              fetch('/toefl/listening/real-exams/_template.md')
+                .then(response => response.text())
+                .then(template => {
+                  // 解析页面的前置元数据
+                  let frontMatter = {};
+                  let contentWithoutFrontMatter = content;
+                  
+                  // 检查是否有前置元数据
+                  const fmMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+                  if (fmMatch) {
+                    // 提取前置元数据
+                    const fmContent = fmMatch[1];
+                    contentWithoutFrontMatter = fmMatch[2];
+                    
+                    // 解析YAML格式的前置元数据
+                    fmContent.split('\n').forEach(line => {
+                      if (line.trim() && line.includes(':')) {
+                        const [key, ...valueParts] = line.split(':');
+                        const value = valueParts.join(':').trim();
+                        frontMatter[key.trim()] = value;
+                      }
+                    });
+                  }
+                  
+                  // 提取页面元数据
+                  const title = frontMatter.title || vm.route.path.split('/').pop().replace('.md', '');
+                  const date = frontMatter.date || new Date().toISOString().slice(0, 10);
+                  const videoUrl = frontMatter.videoUrl || '';
+                  
+                  // 从内容中提取音频原文、问题和答案
+                  let transcript = '';
+                  let questions = '';
+                  let answers = '';
+                  
+                  // 提取音频原文
+                  const transcriptMatch = contentWithoutFrontMatter.match(/###\s*音频原文\s*([\s\S]*?)(?=###|$)/);
+                  if (transcriptMatch) {
+                    transcript = transcriptMatch[1].trim();
+                  }
+                  
+                  // 提取问题
+                  const questionsMatch = contentWithoutFrontMatter.match(/###\s*问题\s*([\s\S]*?)(?=###\s*答案|$)/);
+                  if (questionsMatch) {
+                    questions = questionsMatch[1].trim();
+                  }
+                  
+                  // 提取答案
+                  const answersMatch = contentWithoutFrontMatter.match(/###\s*答案\s*([\s\S]*?)(?=###|$)/);
+                  if (answersMatch) {
+                    answers = answersMatch[1].trim();
+                  }
+                  
+                  // 使用提取的内容填充模板
+                  let processedContent = template
+                    .replace(/{{title}}/g, title)
+                    .replace(/{{date}}/g, date)
+                    .replace(/{{videoUrl}}/g, videoUrl)
+                    .replace(/{{transcript}}/g, transcript)
+                    .replace(/{{questions}}/g, questions)
+                    .replace(/{{answers}}/g, answers);
+                  
+                  // 返回处理后的内容
+                  next(processedContent);
+                })
+                .catch(error => {
+                  console.error('Error loading template:', error);
+                  next(content);
+                });
+            } else {
+              next(content);
+            }
+          });
+
+          hook.doneEach(function() {
+            const answerSections = document.querySelectorAll('.answer-section');
+            const buttons = document.querySelectorAll('.show-answer-btn');
+            
+            buttons.forEach((button, index) => {
+              button.addEventListener('click', function() {
+                const answerSection = answerSections[index];
+                if (answerSection.style.display === 'block') {
+                  answerSection.style.display = 'none';
+                  button.textContent = '显示答案';
+                } else {
+                  answerSection.style.display = 'block';
+                  button.textContent = '隐藏答案';
+                }
+              });
+            });
+
+            const path = vm.route.path;
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(link => {
+              if (link.getAttribute('href') === ('#' + path)) {
+                link.parentElement.classList.add('active');
+              }
+            });
+          });
+        }
+      ]
+    }
+  </script>
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+</body>
+</html>
